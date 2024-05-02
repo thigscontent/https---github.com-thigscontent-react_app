@@ -1,27 +1,53 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { AntDesign } from '@expo/vector-icons'; // Importar o ícone do livro da biblioteca expo-icons
 import axios from 'axios';
 
-export default function Login() {
-  async function fetchData() {
-    try {
-      const response = await axios.get("http://192.168.1.12:3000/users");
-      console.log(response.data);
-    } catch (error) {
-      console.error(error);
+export default function Login({navigation:{navigate}}) {
+  
+  const [email,setEmail] = useState('')
+  const [password,setPassword] = useState('')
+
+
+  async function enterData() {
+    const data = {
+      email:email,
+      password:password
     }
-  }
+    await axios.post('http://192.168.1.12:3000/users/login', data)
+    .then((res)=>{
+      const token = res.data.data.token
+      axios.post('http://192.168.1.12:3000/users/token',data,{
+        headers:{
+          Authorization:`Bearer ${token}`
+        }
+      })
+      .then(()=>{
+        navigate('painel')
+        alert('Login efetuado com Sucesso!')
+      }).catch(
+        exception => {
+          console.log(exception)
+          alert('Usuário ou senha inválidos!')
+        }
+      )
+    })
+    .catch(
+      exception => {
+        console.log(exception)
+        alert('Erro na autenticação!')
+      }
+    )
+  }   
 
   return (
     <View style={styles.container}>
       <View style={styles.iconContainer}>
-        <AntDesign name="book" size={50} color="#8B4513" />
+        <AntDesign name="book" size={50} color="#8B4513"/>
       </View>
-      <TextInput style={styles.textInput} placeholder="Login" />
-      <TextInput style={styles.textInput} placeholder="Email" />
-      <TextInput style={styles.textInput} placeholder="Password" secureTextEntry={true} />
-      <TouchableOpacity style={styles.button} onPress={fetchData}>
+      <TextInput style={styles.textInput} placeholder="Email" value={email} onChangeText = {setEmail}/>
+      <TextInput style={styles.textInput} placeholder="Password" secureTextEntry={true} value={password} onChangeText = {setPassword} />
+      <TouchableOpacity style={styles.button} onPress={enterData}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
     </View>
@@ -63,3 +89,4 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
