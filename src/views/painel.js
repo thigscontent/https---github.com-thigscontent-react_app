@@ -1,13 +1,21 @@
 import React from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { AntDesign } from '@expo/vector-icons'; // Importar o ícone do livro da biblioteca expo-icons
+import { AntDesign } from '@expo/vector-icons';
 import axios from 'axios';
 
-export default function Painel() {
+export default function Painel({navigation:{navigate}}) {
   async function fetchData() {
     try {
-      const response = await axios.get("http://192.168.1.12:3000/users");
-      console.log(response.data);
+      await axios.get("http://192.168.1.12:3000/book")
+      .then(res=>{
+        const data = res.data.map(book=>{
+            return{
+                name:book.name,
+                author:book.author
+            }
+        })
+        navigate('findbook',data)
+      })
     } catch (error) {
       console.error(error);
     }
@@ -18,16 +26,16 @@ export default function Painel() {
       <View style={styles.iconContainer}>
         <AntDesign name="book" size={50} color="#8B4513" />
       </View>
-      <TouchableOpacity style={styles.button} onPress={() => console.log("Adicionar livro")}>
+      <TouchableOpacity style={styles.button} onPress={() => navigate('createbook')}>
         <Text style={styles.buttonText}>Adicionar Livro</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={() => console.log("Remover livro")}>
+      <TouchableOpacity style={styles.button} onPress={() => navigate('deletebook')}>
         <Text style={styles.buttonText}>Remover Livro</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={() => console.log("Procurar livro")}>
+      <TouchableOpacity style={styles.button} onPress={fetchData}>
         <Text style={styles.buttonText}>Procurar Livro</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={() => console.log("Alterar informações do livro")}>
+      <TouchableOpacity style={styles.button} onPress={() => navigate('updatebook')}>
         <Text style={styles.buttonText}>Alterar Informações do Livro</Text>
       </TouchableOpacity>
     </View>

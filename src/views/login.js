@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { AntDesign } from '@expo/vector-icons'; // Importar o ícone do livro da biblioteca expo-icons
+import { AntDesign } from '@expo/vector-icons';
 import axios from 'axios';
 
 export default function Login({navigation:{navigate}}) {
